@@ -10,31 +10,30 @@ terraform {
 provider "google" {
   # Configuration options
 
-  project     = "class5-416923"
-  credentials = "class5-416923-759a04e64c63.json"
-  zone        = "europe-southwest1-a"
-  region      = "europe-southwest1"  # Choose a suitable Europe region
+  project = "meta-origin-418619"
+  credentials = "meta-origin-418619-70e77aa9af3c.json"
+  zone = "europe-southwest1-a"
+  region = "europe-southwest1" 
 }
 
 # Create a VPC network
-resource "google_compute_network" "private_network" {
-  name                    = "private-network"
+resource "google_compute_network" "priv-net1" {
+  name                    = "priv-net1"
   auto_create_subnetworks = false
 }
 
 # Create a subnet within the VPC network
-resource "google_compute_subnetwork" "private_subnet" {
-  name          = "private-subnet"
-  ip_cidr_range = "10.0.0.0/16" # RFC 1918 Private 10 net #10.0.0.0/24?
-  network       = google_compute_network.private_network.self_link
-  region        = "europe-southwest1"  # Same region as the VPC network
+resource "google_compute_subnetwork" "priv-sub1" {
+  name = "priv-sub1"
+  ip_cidr_range = "10.0.0.0/16" 
+  network = google_compute_network.priv-net1.self_link
+  region = "europe-southwest1"  
 }
 
 # Create a firewall rule to block all incoming traffic from the internet
-resource "google_compute_firewall" 
-"block_internet_access" {
-  name    = "block-internet-access"
-  network = google_compute_network.private_network.self_link
+resource "google_compute_firewall" "priv-fw1" {
+  name = "priv-fw1"
+  network = google_compute_network.priv-net1.self_link
 
   deny {
     protocol = "all"
@@ -44,19 +43,19 @@ resource "google_compute_firewall"
 }
 
 # Create a GCP instance within the private subnet
-resource "google_compute_instance" "private_instance" {
-  name         = "private-instance"
+resource "google_compute_instance" "priv-ins1" {
+  name = "priv-ins1"
   machine_type = "e2-medium"
-  zone         = "europe-southwest1-a"  # Choose appropriate zone in Europe
+  zone = "europe-southwest1-a"  # Choose appropriate zone in Europe
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "beautifil.jpg"
     }
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.private_subnet.self_link
+    subnetwork = google_compute_subnetwork.priv-sub1.self_link
     access_config {}
   }
 }
